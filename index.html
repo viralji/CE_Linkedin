@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudExtel: Consolidated 90-Day LinkedIn Growth Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .metric-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #e0e7ff;
+            border: 4px solid #4f46e5;
+        }
+        .content-pillar-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .content-pillar-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 2rem;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 0.5rem;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .table-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+    </style>
+    <!-- Chosen Palette: "Calm Harmony" - Neutrals with a subtle Indigo accent for calls to action and key data points. -->
+    <!-- Application Structure Plan: A single-page dashboard designed for non-linear exploration. It uses a sticky top navigation for quick access to key sections: a main Dashboard for a high-level overview, a Deep Dive Analysis with tabs for granular data exploration, an interactive 90-Day Plan section featuring both a summary timeline and a detailed, filterable daily task table, a visual Content Strategy grid, and a clear breakdown of Growth Levers. This structure was chosen to empower users to access information based on their role and interest, making a complex strategy digestible and actionable through interactive components, rather than a static, linear document. -->
+    <!-- Visualization & Content Choices: The application uses Chart.js for all data visualizations to maintain a consistent look and feel. Key choices include: a line chart for follower growth to show trends, bar charts for audience demographics and competitor comparisons for easy ranking, and a donut chart for proportional data like content performance. The 90-day plan is presented in two ways: a high-level timeline and a detailed, interactive HTML table powered by JavaScript for filtering. This provides both a quick overview and granular detail, consolidating inputs from all provided source reports. Content pillars are shown as interactive cards to encourage exploration. This approach ensures all data is presented in the most effective format for understanding and interaction, adhering to the NO SVG/Mermaid constraint. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="text-2xl font-bold text-gray-800">
+                    <span class="text-indigo-600">Cloud</span>Extel
+                </div>
+                <div class="border-l border-gray-300 h-8 hidden md:block"></div>
+                <h1 class="text-lg font-semibold text-gray-600 hidden md:block">Consolidated Growth Blueprint</h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#dashboard" class="nav-link active py-2">Dashboard</a>
+                <a href="#analysis" class="nav-link py-2">Deep Dive</a>
+                <a href="#plan" class="nav-link py-2">90-Day Plan</a>
+                <a href="#content" class="nav-link py-2">Content Strategy</a>
+                <a href="#growth" class="nav-link py-2">Growth Levers</a>
+            </div>
+            <div class="md:hidden">
+                <select id="mobile-nav" class="bg-white border border-gray-300 rounded-md p-2">
+                    <option value="#dashboard">Dashboard</option>
+                    <option value="#analysis">Deep Dive</option>
+                    <option value="#plan">90-Day Plan</option>
+                    <option value="#content">Content Strategy</option>
+                    <option value="#growth">Growth Levers</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="dashboard" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">The Challenge & The Goal</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">This consolidated dashboard outlines the definitive strategic plan to elevate CloudExtel's LinkedIn presence, targeting **50,000 followers in 90 days** by integrating the best strategies and data available.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="metric-card bg-white p-6 rounded-lg shadow-sm text-center">
+                    <h3 class="text-gray-500 text-sm font-medium">Current Followers</h3>
+                    <p class="text-4xl font-bold text-indigo-600">6,255</p>
+                </div>
+                <div class="metric-card bg-white p-6 rounded-lg shadow-sm text-center">
+                    <h3 class="text-gray-500 text-sm font-medium">90-Day Goal</h3>
+                    <p class="text-4xl font-bold text-green-500">50,000</p>
+                </div>
+                <div class="metric-card bg-white p-6 rounded-lg shadow-sm text-center">
+                    <h3 class="text-gray-500 text-sm font-medium">Required Daily Growth</h3>
+                    <p class="text-4xl font-bold text-amber-500">~486</p>
+                </div>
+                <div class="metric-card bg-white p-6 rounded-lg shadow-sm text-center">
+                    <h3 class="text-gray-500 text-sm font-medium">Avg. Engagement Rate</h3>
+                    <p class="text-4xl font-bold text-sky-500">~3.5%</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 md:p-8 rounded-lg shadow">
+                <h3 class="text-xl font-bold text-center mb-4">Follower Growth Trajectory</h3>
+                <div class="chart-container">
+                    <canvas id="followerGrowthChart"></canvas>
+                </div>
+                 <p class="text-center text-sm text-gray-500 mt-4">This chart illustrates the ambitious but achievable growth required to reach our 90-day goal, compared to the current organic growth trend. The plan is designed to bridge this gap through strategic content and amplification.</p>
+            </div>
+        </section>
+
+        <hr class="my-12">
+
+        <section id="analysis" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">Deep Dive Analysis</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Understanding our current position is the first step. This section provides an interactive analysis of our performance, audience, and competitive landscape, integrating all available data.</p>
+            
+            <div class="bg-white p-4 md:p-8 rounded-lg shadow">
+                <div class="flex justify-center mb-6 border-b">
+                    <button class="tab-button py-2 px-4 font-medium text-gray-600 active" data-tab="performance">Performance Audit</button>
+                    <button class="tab-button py-2 px-4 font-medium text-gray-600" data-tab="audience">Audience Insights</button>
+                    <button class="tab-button py-2 px-4 font-medium text-gray-600" data-tab="competitors">Competitive Landscape</button>
+                </div>
+
+                <div id="performance" class="tab-content">
+                    <h3 class="text-xl font-bold text-center mb-4">What's Working? Top Performing Content</h3>
+                     <p class="text-center text-sm text-gray-500 mb-6">Our audience responds strongly to content that humanizes the brand (company culture) and provides significant industry value (white papers). This is a key insight for our future content strategy.</p>
+                    <div class="chart-container">
+                        <canvas id="topPerformingContentChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="audience" class="tab-content hidden">
+                     <h3 class="text-xl font-bold text-center mb-4">Who Are We Reaching?</h3>
+                     <p class="text-center text-sm text-gray-500 mb-6">The data confirms we are attracting the right professionals: senior decision-makers in our core industries of Telecommunications and IT, primarily in key Indian business hubs.</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="chart-container">
+                            <h4 class="text-center font-semibold mb-2">Audience by Industry</h4>
+                            <canvas id="industryChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h4 class="text-center font-semibold mb-2">Audience by Seniority</h4>
+                            <canvas id="seniorityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="competitors" class="tab-content hidden">
+                    <h3 class="text-xl font-bold text-center mb-4">How Do We Stack Up?</h3>
+                    <p class="text-center text-sm text-gray-500 mb-6">While competitors like Indus Towers lead in follower count, our engagement rate is highly competitive, indicating a passionate core audience. Our opportunity is to scale our reach while maintaining this high level of engagement.</p>
+                    <div class="chart-container">
+                        <canvas id="competitorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12">
+
+        <section id="plan" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">The 90-Day Growth Plan</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">A three-phase sprint designed to build momentum, scale content, and amplify our message. Below is a high-level summary and a detailed, interactive daily plan.</p>
+            
+            <div class="relative pl-8 mb-12">
+                <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-indigo-200"></div>
+                <div class="timeline-item mb-12 relative">
+                    <h3 class="text-2xl font-bold text-indigo-600">Phase 1: Foundation & Acceleration (Days 1-30)</h3>
+                    <p class="text-gray-600 mt-2">Optimize our LinkedIn presence, launch foundational content pillars, and activate our internal team as a primary amplification engine.</p>
+                </div>
+                <div class="timeline-item mb-12 relative">
+                    <h3 class="text-2xl font-bold text-indigo-600">Phase 2: Scaling Content & Community (Days 31-60)</h3>
+                    <p class="text-gray-600 mt-2">Increase content velocity with high-engagement formats like video and native documents, and begin proactive community engagement.</p>
+                </div>
+                <div class="timeline-item relative">
+                    <h3 class="text-2xl font-bold text-indigo-600">Phase 3: Amplification & Authority (Days 61-90)</h3>
+                    <p class="text-gray-600 mt-2">Solidify our position as an industry authority using targeted paid amplification and high-value content events.</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 md:p-8 rounded-lg shadow">
+                <h3 class="text-xl font-bold text-center mb-4">Detailed Daily Action Plan</h3>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
+                    <div class="w-full md:w-auto">
+                        <label for="phaseFilter" class="block text-sm font-medium text-gray-700">Filter by Phase:</label>
+                        <select id="phaseFilter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="all">All Phases</option>
+                            <option value="1">Phase 1</option>
+                            <option value="2">Phase 2</option>
+                            <option value="3">Phase 3</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <label for="pillarFilter" class="block text-sm font-medium text-gray-700">Filter by Pillar:</label>
+                        <select id="pillarFilter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="all">All Pillars</option>
+                            <option value="Leadership & Vision">Leadership & Vision</option>
+                            <option value="Technology & Innovation Demystified">Tech & Innovation</option>
+                            <option value="The Future of Connectivity">Future of Connectivity</option>
+                            <option value="The CloudExtel Impact">The CloudExtel Impact</option>
+                            <option value="Inside CloudExtel (Culture & Employer Brand)">Inside CloudExtel</option>
+                            <option value="Strategic Activities">Strategic Activities</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container border rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task / Post Topic</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pillar</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Format</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plan-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- JS will populate this -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <hr class="my-12">
+
+        <section id="content" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">Content & Creative Strategy</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Our content will be organized around five core pillars to ensure a balanced and compelling narrative. Click on each pillar to learn more.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="content-pillar-card bg-white p-6 rounded-lg shadow-lg text-center" data-pillar="tech">
+                    <div class="text-4xl mb-4">💡</div>
+                    <h3 class="text-xl font-bold">Tech & Innovation Demystified</h3>
+                </div>
+                <div class="content-pillar-card bg-white p-6 rounded-lg shadow-lg text-center" data-pillar="leadership">
+                    <div class="text-4xl mb-4">👤</div>
+                    <h3 class="text-xl font-bold">Leadership & Vision</h3>
+                </div>
+                <div class="content-pillar-card bg-white p-6 rounded-lg shadow-lg text-center" data-pillar="impact">
+                    <div class="text-4xl mb-4">🚀</div>
+                    <h3 class="text-xl font-bold">The CloudExtel Impact</h3>
+                </div>
+                <div class="content-pillar-card bg-white p-6 rounded-lg shadow-lg text-center" data-pillar="future">
+                    <div class="text-4xl mb-4">🔮</div>
+                    <h3 class="text-xl font-bold">The Future of Connectivity</h3>
+                </div>
+                <div class="content-pillar-card bg-white p-6 rounded-lg shadow-lg text-center" data-pillar="culture">
+                    <div class="text-4xl mb-4">🤝</div>
+                    <h3 class="text-xl font-bold">Inside CloudExtel (Culture)</h3>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12">
+
+        <section id="growth" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">Advanced Growth Levers</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Beyond organic content, we will use two key levers to accelerate growth: activating our internal team and precision-targeted paid amplification.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold mb-4">Employee Advocacy Engine</h3>
+                    <p class="text-gray-600 mb-4">Turning our team into a megaphone is the most authentic way to scale our reach. Content shared by employees receives significantly higher trust and engagement.</p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Secure executive buy-in and leadership participation.</li>
+                        <li>Establish simple guidelines and a central content hub.</li>
+                        <li>Encourage personalization to maintain authenticity.</li>
+                        <li>Gamify and recognize top advocates to drive participation.</li>
+                    </ol>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold mb-4">Paid Amplification (₹20,000 Budget)</h3>
+                    <p class="text-gray-600 mb-4">We will add "rocket fuel" to our best-performing organic content, ensuring our budget is spent on posts already proven to resonate with our audience.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="font-semibold">Boost 1 (₹10,000): High-Value Content</p>
+                            <p class="text-sm text-gray-600">Promote the Mumbai Rail case study to a hyper-targeted audience of network architects and CTOs in the telecom sector.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Boost 2 (₹10,000): High-Engagement Culture</p>
+                            <p class="text-sm text-gray-600">Amplify our top-performing culture post to support employer branding and humanize the company.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="pillarModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modalTitle" class="text-2xl font-bold mb-4"></h3>
+            <p id="modalGoal" class="text-gray-600 mb-4"></p>
+            <h4 class="font-semibold mb-2">Content Examples:</h4>
+            <ul id="modalExamples" class="list-disc list-inside space-y-2 text-gray-700 mb-4"></ul>
+            <h4 class="font-semibold mb-2">Hashtags:</h4>
+            <p id="modalHashtags" class="text-indigo-600 text-sm"></p>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const followerData = {
+                current: 6255,
+                goal: 50000,
+                days: 90
+            };
+
+            const currentTrend = Array.from({ length: followerData.days + 1 }, (_, i) => Math.round(followerData.current + (i * 18.6))); 
+            const requiredTrend = Array.from({ length: followerData.days + 1 }, (_, i) => Math.round(followerData.current + ((followerData.goal - followerData.current) / followerData.days) * i));
+
+            const followerGrowthCtx = document.getElementById('followerGrowthChart').getContext('2d');
+            new Chart(followerGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 14 }, (_, i) => `Day ${i * 7}`),
+                    datasets: [{
+                        label: 'Required Growth',
+                        data: requiredTrend.filter((_, i) => i % 7 === 0),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Current Trend',
+                        data: currentTrend.filter((_, i) => i % 7 === 0),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return value / 1000 + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const topPerformingContentCtx = document.getElementById('topPerformingContentChart').getContext('2d');
+            new Chart(topPerformingContentCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Culture: Road Safety Week', 'Content: NHIS White Paper', 'Culture: Men\'s Day', 'Leadership: Media Feature'],
+                    datasets: [{
+                        label: 'Engagement Rate (%)',
+                        data: [44.3, 44.1, 28.8, 7.6],
+                        backgroundColor: ['#4f46e5', '#4338ca', '#a5b4fc', '#c7d2fe'],
+                        borderColor: '#c7d2fe',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Engagement Rate (%)' }
+                        }
+                    }
+                }
+            });
+
+            const industryCtx = document.getElementById('industryChart').getContext('2d');
+            new Chart(industryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Telecommunications', 'IT Services & Consulting', 'Software Development', 'Business Consulting', 'Financial Services'],
+                    datasets: [{
+                        label: 'Followers by Industry',
+                        data: [1632, 620, 215, 161, 119],
+                        backgroundColor: ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            const seniorityCtx = document.getElementById('seniorityChart').getContext('2d');
+            new Chart(seniorityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Senior', 'Entry', 'Manager', 'Director', 'VP', 'CXO'],
+                    datasets: [{
+                        label: 'Total Followers',
+                        data: [2038, 1346, 932, 518, 311, 119],
+                        backgroundColor: '#4f46e5',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            const competitorCtx = document.getElementById('competitorChart').getContext('2d');
+            new Chart(competitorCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Indus Towers', 'iBUS', 'CloudExtel', 'Space World'],
+                    datasets: [{
+                        label: 'Total Followers',
+                        data: [140887, 9560, 6255, 5640],
+                        backgroundColor: '#4f46e5',
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Engagement Rate (%)',
+                        data: [2.5, 3.2, 3.5, 4.1],
+                        backgroundColor: '#a5b4fc',
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'logarithmic',
+                            position: 'left',
+                            title: { display: true, text: 'Followers (Log Scale)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'Engagement Rate (%)' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = tab.getAttribute('data-tab');
+                    tabContents.forEach(content => {
+                        if (content.id === target) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            const mobileNav = document.getElementById('mobile-nav');
+            mobileNav.addEventListener('change', (e) => {
+                const targetId = e.target.value;
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+            });
+
+            const pillarCards = document.querySelectorAll('.content-pillar-card');
+            const modal = document.getElementById('pillarModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalGoal = document.getElementById('modalGoal');
+            const modalExamples = document.getElementById('modalExamples');
+            const modalHashtags = document.getElementById('modalHashtags');
+            const closeModal = document.querySelector('.close-button');
+
+            const pillarData = {
+                tech: {
+                    title: "💡 Tech & Innovation Demystified",
+                    goal: "To educate the market on the value of CloudExtel's core technologies (NaaS, Small Cells, Shared RAN) and establish undisputed technical credibility. This pillar directly addresses the need to evangelize the NaaS model.",
+                    examples: [
+                        "Carousel: '5 Myths about Small Cell Deployment, Busted.'",
+                        "Short Video: 'Our CTO Explains: What is a Shared Radio Access Network (RAN)?'",
+                        "Text Post: Explaining the multi-layered security in our NaaS architecture."
+                    ],
+                    hashtags: "#NaaS #SmallCells #SharedRAN #DigitalInfrastructure #5G"
+                },
+                leadership: {
+                    title: "👤 Leadership & Vision",
+                    goal: "To leverage the expertise and profiles of the entire leadership team to build brand authority and create a human connection with the audience.",
+                    examples: [
+                        "Quote Graphic: An executive with a powerful quote on the future of fiber.",
+                        "Text-Only 'Hot Take' Post: CEO's perspective on a new industry policy.",
+                        "'Ask Me Anything' (AMA) Session with a key leader."
+                    ],
+                    hashtags: "#Leadership #Vision #Telecom #FutureOfTech"
+                },
+                impact: {
+                    title: "🚀 The CloudExtel Impact",
+                    goal: "To translate services into tangible business outcomes and build trust through social proof, moving beyond features to focus on results.",
+                    examples: [
+                        "Native Document (PDF): Full case study on the Mumbai Railway project.",
+                        "Carousel: 5-slide visual summary of the Mumbai Rail case study (10x speed!).",
+                        "Client Testimonial Graphic from a key partner."
+                    ],
+                    hashtags: "#CaseStudy #DigitalTransformation #Connectivity #Impact"
+                },
+                future: {
+                    title: "🔮 The Future of Connectivity",
+                    goal: "To position CloudExtel as a forward-thinking guide that understands the broader market dynamics, thereby elevating its status from a vendor to a strategic advisor.",
+                    examples: [
+                        "Interactive Poll: 'Which technology will have the biggest impact on Telco infra?'",
+                        "Curated News with Commentary from a CloudExtel expert.",
+                        "Text Post/Carousel: '3 Trends We're Watching in Private 5G.'"
+                    ],
+                    hashtags: "#FutureOfConnectivity #IndustryTrends #Private5G #EdgeComputing"
+                },
+                culture: {
+                    title: "🤝 Inside CloudExtel (Culture)",
+                    goal: "To humanize the brand, attract top-tier talent essential for growth, and differentiate from larger, more impersonal competitors by showcasing the company's values and people.",
+                    examples: [
+                        "Employee Spotlight: 'Meet our VP of HR & Admin...'",
+                        "'Our Values' Carousel: A post for each core value with a real story.",
+                        "Behind-the-scenes photo from a team brainstorming session."
+                    ],
+                    hashtags: "#CloudExtelCulture #LifeAtCloudExtel #Team #Innovation"
+                }
+            };
+
+            pillarCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const pillar = card.dataset.pillar;
+                    const data = pillarData[pillar];
+                    modalTitle.textContent = data.title;
+                    modalGoal.textContent = data.goal;
+                    modalExamples.innerHTML = data.examples.map(ex => `<li>${ex}</li>`).join('');
+                    modalHashtags.textContent = data.hashtags;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            closeModal.onclick = function() {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+            
+            const fullPlan = [
+                { day: 1, phase: 1, topic: "Audit/update page (banner, about, keywords like 'NaaS'). Optimize personal profiles of key leaders.", pillar: "Strategic Activities", format: "Optimization", owner: "Marketing" },
+                { day: 2, phase: 1, topic: "Post: How neutral host small cells cut capex for MNOs (Mumbai case).", pillar: "Technology & Innovation Demystified", format: "Carousel", owner: "Marketing" },
+                { day: 3, phase: 1, topic: "Launch employee advocacy: Train 10-20 staff to share posts weekly; create shareable templates.", pillar: "Strategic Activities", format: "Training", owner: "HR/Marketing" },
+                { day: 4, phase: 1, topic: "Post: DN TAT: 2 days → 30 minutes (how we did it).", pillar: "The CloudExtel Impact", format: "Video (90s)", owner: "Marketing" },
+                { day: 5, phase: 1, topic: "Join 5-7 LinkedIn Groups (e.g., Telecom Infra, 5G Networks); post intros/shares.", pillar: "Strategic Activities", format: "Engagement", owner: "Marketing" },
+                { day: 6, phase: 1, topic: "Engage: Respond to all comments; like/comment on 30 industry posts.", pillar: "Strategic Activities", format: "Engagement", owner: "Marketing" },
+                { day: 7, phase: 1, topic: "Post: Recap carousel (best comments of the week, highlight reel).", pillar: "Inside CloudExtel (Culture & Employer Brand)", format: "Carousel", owner: "Marketing" },
+                { day: 8, phase: 1, topic: "Boost top post from Week 1 (₹1,000, target India telecom engineers).", pillar: "Strategic Activities", format: "Paid Ad", owner: "Marketing" },
+                { day: 9, phase: 1, topic: "Post: 5G densification: what most cities get wrong.", pillar: "Leadership & Vision", format: "Text + Image", owner: "Leadership" },
+                { day: 10, phase: 1, topic: "Start group thread/poll in a key industry group.", pillar: "Strategic Activities", format: "Engagement", owner: "Marketing" },
+                { day: 11, phase: 1, topic: "Post: Field diaries: one pole, five networks.", pillar: "Inside CloudExtel (Culture & Employer Brand)", format: "Photo Set", owner: "Marketing" },
+                { day: 12, phase: 1, topic: "Engage in groups; DM 20 followers for feedback/shares.", pillar: "Strategic Activities", format: "Engagement", owner: "Marketing" },
+                { day: 13, phase: 1, topic: "Post: FTTH myths vs facts (installer’s edition).", pillar: "Technology & Innovation Demystified", format: "Carousel", owner: "Marketing" },
+                { day: 14, phase: 1, topic: "Weekly Review: Analyze follower growth and engagement. Plan next week's content.", pillar: "Strategic Activities", format: "Analysis", owner: "Marketing" },
+                { day: 31, phase: 2, topic: "Post: Collaborate with 1 partner on a co-mentioned post.", pillar: "The CloudExtel Impact", format: "Image/Text", owner: "Marketing/BD" },
+                { day: 32, phase: 2, topic: "Launch first 'Technology Demystified' video.", pillar: "Technology & Innovation Demystified", format: "Video", owner: "Marketing/Tech" },
+                { day: 33, phase: 2, topic: "Host free LinkedIn Poll series in groups.", pillar: "The Future of Connectivity", format: "Poll", owner: "Marketing" },
+                { day: 40, phase: 2, topic: "Publish Mumbai Rail case study as a native document.", pillar: "The CloudExtel Impact", format: "Document", owner: "Marketing" },
+                { day: 45, phase: 2, topic: "Mid-phase review: Check progress towards +15,000 followers.", pillar: "Strategic Activities", format: "Analysis", owner: "Marketing" },
+                { day: 54, phase: 2, topic: "Boost 1: Promote Mumbai Rail case study (₹10,000).", pillar: "Strategic Activities", format: "Paid Ad", owner: "Marketing" },
+                { day: 60, phase: 2, topic: "Phase 2 Review: Analyze results, plan for final amplification phase.", pillar: "Strategic Activities", format: "Analysis", owner: "Marketing" },
+                { day: 61, phase: 3, topic: "Launch free hashtag challenge (#ReinventDigitalInfra).", pillar: "Strategic Activities", format: "Campaign", owner: "Marketing" },
+                { day: 63, phase: 3, topic: "Promote upcoming free webinar/LinkedIn Live.", pillar: "The Future of Connectivity", format: "Event", owner: "Marketing" },
+                { day: 68, phase: 3, topic: "Boost 2: Promote top-performing culture post (₹10,000).", pillar: "Strategic Activities", format: "Paid Ad", owner: "Marketing" },
+                { day: 69, phase: 3, topic: "Host free LinkedIn Live or a detailed Q&A thread.", pillar: "Leadership & Vision", format: "Event/Engagement", owner: "Leadership" },
+                { day: 75, phase: 3, topic: "Mid-phase review: Check progress towards +22,000 followers.", pillar: "Strategic Activities", format: "Analysis", owner: "Marketing" },
+                { day: 89, phase: 3, topic: "Final push: Heavy engagement and promotion of top content.", pillar: "Strategic Activities", format: "Engagement", owner: "All" },
+                { day: 90, phase: 3, topic: "Celebrate 50k milestone! Thank the community and plan ongoing organic maintenance.", pillar: "Inside CloudExtel (Culture & Employer Brand)", format: "Celebration Post", owner: "Marketing" }
+            ];
+
+            const planTableBody = document.getElementById('plan-table-body');
+            const phaseFilter = document.getElementById('phaseFilter');
+            const pillarFilter = document.getElementById('pillarFilter');
+
+            function renderPlan() {
+                planTableBody.innerHTML = '';
+                const selectedPhase = phaseFilter.value;
+                const selectedPillar = pillarFilter.value;
+
+                const filteredPlan = fullPlan.filter(item => {
+                    const phaseMatch = selectedPhase === 'all' || item.phase == selectedPhase;
+                    const pillarMatch = selectedPillar === 'all' || item.pillar === selectedPillar;
+                    return phaseMatch && pillarMatch;
+                });
+
+                filteredPlan.forEach(item => {
+                    const row = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.day}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.topic}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.pillar}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.format}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.owner}</td>
+                        </tr>
+                    `;
+                    planTableBody.innerHTML += row;
+                });
+            }
+
+            phaseFilter.addEventListener('change', renderPlan);
+            pillarFilter.addEventListener('change', renderPlan);
+
+            renderPlan();
+        });
+    </script>
+</body>
+</html>
